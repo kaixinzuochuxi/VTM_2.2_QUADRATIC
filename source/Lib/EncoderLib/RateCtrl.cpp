@@ -513,7 +513,7 @@ void EncRCGOP::xCalEquaCoeff( EncRCSeq* encRCSeq, double* lambdaRatio, double* e
     double bpp = encRCSeq->getAverageBits();
     //////////////////////////////////////////////////////////////////
     ////////// TODO:RECALCULATE LAMBDA RATIO
-    equaCoeffA[i] = -(a*log(bpp)+b)/lambdaRatio[i];
+    equaCoeffA[i] = -(2*a*log(bpp/3)+b)/lambdaRatio[i];
     equaCoeffB[i] = 1;
 #else
 
@@ -835,7 +835,7 @@ double EncRCPic::estimatePicLambda(list<EncRCPic*>& listPreviousPictures, bool i
   }
   else
   {
-    estLambda = -2*a*log(bpp)/bpp-b/bpp;
+    estLambda = -2*a*log(bpp/3)/bpp-b/bpp;
   }
 
   double lastLevelLambda = -1.0;
@@ -906,7 +906,7 @@ double EncRCPic::estimatePicLambda(list<EncRCPic*>& listPreviousPictures, bool i
     //m_LCUs[i].m_bitWeight = m_LCUs[i].m_numberOfPixel * pow(estLambda / aLCU, 1.0 / bLCU);
     //////////     a*log(bpp)/bpp+b/bpp,from lambda to bpp. lnbpp distribution!!!
     ////////// use the average bpp for this frame
-    m_LCUs[i].m_bitWeight = m_LCUs[i].m_numberOfPixel * (-2*aLCU*log(bpp)- bLCU)/ estLambda;
+    m_LCUs[i].m_bitWeight = m_LCUs[i].m_numberOfPixel * (-2*aLCU*log(bpp/3)- bLCU)/ estLambda;
 
 
 
@@ -1138,7 +1138,7 @@ double EncRCPic::getLCUEstLambda(double bpp)
     b = m_encRCSeq->getPicPara(m_frameLevel).m_b;
   }
 
-  double estLambda = -2*a * log(bpp) / bpp - b / bpp;
+  double estLambda = -2*a * log(bpp/3) / bpp - b / bpp;
   //for Lambda clip, picture level clip
   double clipPicLambda = m_estPicLambda;
 
@@ -1293,7 +1293,7 @@ void EncRCPic::updateAfterCTU(int LCUIdx, int bits, int QP, double lambda, bool 
   int LCUActualBits = m_LCUs[LCUIdx].m_actualBits;
   int LCUTotalPixels = m_LCUs[LCUIdx].m_numberOfPixel;
   double bpp = (double)LCUActualBits / (double)LCUTotalPixels;
-  double calLambda = a * log(bpp) / bpp + b / bpp;
+  double calLambda = -2*a * log(bpp/3) / bpp - b / bpp;
   double inputLambda = m_LCUs[LCUIdx].m_lambda;
 
   ///////////////////////////////////////////////////////TODO
@@ -1601,7 +1601,7 @@ void EncRCPic::updateAfterPicture(int actualHeaderBits, int actualTotalBits, dou
     // update parameters
     double picActualBits = (double)m_picActualBits;
     double picActualBpp = picActualBits / (double)m_validPixelsInPic;
-    double calLambda = a * log(picActualBpp) / picActualBpp + b / picActualBpp;
+    double calLambda = -2*a * log(picActualBpp/3) / picActualBpp - b / picActualBpp;
     double inputLambda = m_picLambda;
 
 
@@ -1622,9 +1622,9 @@ void EncRCPic::updateAfterPicture(int actualHeaderBits, int actualTotalBits, dou
       double avgMSE = getPicMSE();
       //double updatedK = picActualBpp * averageLambda / avgMSE;
       //double updatedC = avgMSE / pow(picActualBpp, -updatedK);
-      rcPara.m_a = (avgMSE - rcPara.m_c - rcPara.m_b*log(picActualBpp)) / pow(log(picActualBpp), 2.0);
-      rcPara.m_b = (avgMSE - rcPara.m_c - rcPara.m_a*pow(log(picActualBpp), 2.0)) / log(picActualBpp);
-      rcPara.m_c = avgMSE - rcPara.m_b*log(picActualBpp) - rcPara.m_a*pow(log(picActualBpp), 2.0);
+      rcPara.m_a = (avgMSE - rcPara.m_c - rcPara.m_b*log(picActualBpp/3)) / pow(log(picActualBpp/3), 2.0);
+      rcPara.m_b = (avgMSE - rcPara.m_c - rcPara.m_a*pow(log(picActualBpp/3), 2.0)) / log(picActualBpp/3);
+      rcPara.m_c = avgMSE - rcPara.m_b*log(picActualBpp/3) - rcPara.m_a*pow(log(picActualBpp/3), 2.0);
 
 
       /* TODO:::: different tid
@@ -1827,13 +1827,13 @@ double EncRCPic::calculateLambdaIntra(double a, double b, double MADPerPixel, do
   /////////////////////////////////////TODO
   //return ((alpha / 256.0) * pow(MADPerPixel / bitsPerPixel, beta));
 
-#if PrintTemporalResult 
-  printf("%f\t%f\t", MADPerPixel, bitsPerPixel);
-#endif
-  //double bpp = MADPerPixel / bitsPerPixel;
-  double bpp = exp(-b/a)/MADPerPixel * bitsPerPixel;
 
-  return  (-2*a * log(bpp) / bpp - b / bpp)/300;
+  double bpp = MADPerPixel / bitsPerPixel/25;
+  //double bpp = exp(-b/a)/MADPerPixel * bitsPerPixel*3;
+#if PrintTemporalResult 
+  printf("%f\t%f\t%f\t", MADPerPixel, bitsPerPixel,bpp);
+#endif
+  return  -2*a * log(bpp/3) / bpp - b / bpp ;
   //return exp((6 * log2(bpp) + 4 - 13.7122) / 4.2005);
   //return  (-2 * a * log(bitsPerPixel) / bitsPerPixel - b / bitsPerPixel)* ;
   
@@ -1891,59 +1891,83 @@ void EncRCPic::updateAlphaBetaIntra(double *a, double *b, double *c)
   */
 #if PrintTemporalResult  
   printf("\t%f\t%f\t", bpp_comp, bpp_real);
-  printf("\t%f\t%f\t", (-2 * (*a)* log(bpp_comp) - (*b)) / (bpp_comp), (-2 * (*a)* log(bpp_real)- (*b)) / (bpp_real));
+  printf("\t%f\t%f\t", (-2 * (*a)* log(bpp_comp/3) - (*b)) / (bpp_comp), (-2 * (*a)* log(bpp_real/3)- (*b)) / (bpp_real));
 #endif
+  
+  // k:symmetry axis
+  double k = (*b) / 2 / (*a);
+  printf("%f\t", k);
+  (*a) = ((*a)*((log(bpp_comp/3) + k) / bpp_comp) / ((log(bpp_real/3) + k) / bpp_real));
+  (*b) = 2 * (*a)*(k*bpp_real / bpp_comp + (bpp_real*log(bpp_comp) - bpp_comp * log(bpp_real)) / bpp_comp);
+  (*c) = m_picMSE - (*a)*pow(log(bpp_real/3), 2) - (*b)*log(bpp_real/3);
 
-  (*a) = (2 * bpp_real*(*a)*log(bpp_comp) + (*b)*(bpp_real - bpp_comp)) / (2 * bpp_comp*log(bpp_real));
-                  
-  (*b) = (*b) *bpp_real / bpp_comp +
-    (2 * bpp_real*(*a)*(bpp_real*log(bpp_comp) - bpp_comp * log(bpp_real))) / bpp_comp;
-  (*c) = m_picMSE - (*a)*pow(log(bpp_real), 2) - (*b)*log(bpp_real);
 
+
+
+  //(*a) = ((2 * bpp_real*(*a)*log(bpp_comp / 3) + (*b)*(bpp_real - bpp_comp)) / (2 * bpp_comp*log(bpp_real / 3)));
+  ////(*a) = ((2 * bpp_comp*log(bpp_real / 3)) + (*b)*(bpp_real - bpp_comp)) / (2 * bpp_real*(*a)*log(bpp_comp / 3));
+  //(*b) = (*b) *bpp_real / bpp_comp +
+  //  (2 * bpp_real*(*a)*(bpp_real*log(bpp_comp / 3) - bpp_comp * log(bpp_real / 3))) / bpp_comp;
+  //(*c) = m_picMSE - (*a)*pow(log(bpp_real), 2) - (*b)*log(bpp_real);
+
+
+  
+  
+  //(*a) = (*a) - 2 * ((2 * (*a)* log(bpp_comp/3) + (*b)) / (bpp_comp)
+  //  -(2 * (*a)* log(bpp_real/3) + (*b)) / (bpp_real))
+  //  * (2 * log(bpp_comp/3) / (bpp_comp)) * 0.01;
+  //(*b) = (*b) - 2 * ((2 * (*a)* log(bpp_comp) + (*b)) / (bpp_comp) -(2 * (*a)* log(bpp_real) )* (1 / (bpp_comp))) * 0.01 ;
+  //(*c) = m_picMSE - (*a)*pow(log(bpp_real), 2) - (*b)*log(bpp_real);
+  //
 
   
 
   
+  //m_encRCSeq->m_MSEprepre = m_encRCSeq->m_MSEpre;
+  //m_encRCSeq->m_MSEpre = m_encRCSeq->m_MSEcur;
+  //m_encRCSeq->m_MSEcur = m_picMSE;
+  //m_encRCSeq->m_bitsprepre = m_encRCSeq->m_bitspre;
+  //m_encRCSeq->m_bitspre = m_encRCSeq->m_bitscur;
+  //m_encRCSeq->m_bitscur = (double)m_picActualBits / m_numberOfPixel;
+  //m_encRCSeq->m_update_times += 1;
 
-  /*
-  m_encRCSeq->m_MSEprepre = m_encRCSeq->m_MSEpre;
-  m_encRCSeq->m_MSEpre = m_encRCSeq->m_MSEcur;
-  m_encRCSeq->m_MSEcur = m_picMSE;
-  m_encRCSeq->m_bitsprepre = m_encRCSeq->m_bitspre;
-  m_encRCSeq->m_bitspre = m_encRCSeq->m_bitscur;
-  m_encRCSeq->m_bitscur = (double)m_picActualBits / m_numberOfPixel;
-  m_encRCSeq->m_update_times += 1;
-
-  double bpp_real = (double)m_picActualBits / (double)m_numberOfPixel;
-  double bpp_comp = (double)m_targetBits / (double)m_numberOfPixel;
-  printf("\t %f\t %f\t %f\n", *a, *b, *c);
-  if (m_encRCSeq->m_update_times==3)
-  {
-    double x1 = log(m_encRCSeq->m_bitscur);
-    double x2 = log(m_encRCSeq->m_bitspre);
-    double x3 = log(m_encRCSeq->m_bitsprepre);
-    double D1 = m_encRCSeq->m_MSEcur;
-    double D2 = m_encRCSeq->m_MSEpre;
-    double D3 = m_encRCSeq->m_MSEprepre;
-    (*b) = ((D1 - D2)*(pow(x1, 2) - pow(x3, 2)) / (pow(x1, 2) - pow(x2, 2)) - (D1 - D3)) 
-      / ((pow(x1, 2) - pow(x3, 2)) / (x1 + x2) - (x1 - x3));
-    (*a) = ((D1 - D2) - (*b)*(x1 - x2)) / (pow(x1, 2) - pow(x2, 2));
-    (*c) = D1 - (*a)*pow(x1, 2) - (*b)*x1;
-  }
-  else
-  {
-    printf("\t %f\t %f\t %f\n", *a, *b, *c);
-    (*a) = (*a) - 2 * ((2 * (*a)* log(bpp_comp) + (*b)) / (bpp_comp)
-      -(2 * (*a)* log(bpp_real) + (*b)) / (bpp_real))
-      * (2 * log(bpp_comp) / (bpp_comp)-2 * log(bpp_real) / (bpp_real)) * 10;
-    (*b) = (*b) - 2 * ((2 * (*a)* log(bpp_comp) + (*b)) / (bpp_comp)
-      -(2 * (*a)* log(bpp_real) + (*b)) / (bpp_real))
-      * (1 / (bpp_comp)-1 / (bpp_real)) * 2.5;
-    (*c) = m_picMSE - (*a)*pow(log(bpp_real), 2) - (*b)*log(bpp_real); 
-  }
-  //printf("\n %f\t %f\t %f\t %f\t %f\t %f", m_encRCSeq->m_bitscur*m_numberOfPixel, m_encRCSeq->m_bitspre*m_numberOfPixel, m_encRCSeq->m_bitsprepre*m_numberOfPixel, m_encRCSeq->m_MSEcur, m_encRCSeq->m_MSEpre, m_encRCSeq->m_MSEprepre);
-  printf("\t %f\t %f\t %f\n", *a, *b, *c);
-  */
+  ////double bpp_real = (double)m_picActualBits / (double)m_numberOfPixel;
+  ////double bpp_comp = (double)m_targetBits / (double)m_numberOfPixel;
+  ////printf("\t %f\t %f\t %f\n", *a, *b, *c);
+  //if (m_encRCSeq->m_update_times==3)
+  //{
+  //  double x1 = log(m_encRCSeq->m_bitscur);
+  //  double x2 = log(m_encRCSeq->m_bitspre);
+  //  double x3 = log(m_encRCSeq->m_bitsprepre);
+  //  double D1 = m_encRCSeq->m_MSEcur;
+  //  double D2 = m_encRCSeq->m_MSEpre;
+  //  double D3 = m_encRCSeq->m_MSEprepre;
+  //  (*b) = ((D1 - D2)*(pow(x1, 2) - pow(x3, 2)) / (pow(x1, 2) - pow(x2, 2)) - (D1 - D3)) 
+  //    / ((pow(x1, 2) - pow(x3, 2)) / (x1 + x2) - (x1 - x3));
+  //  (*a) = ((D1 - D2) - (*b)*(x1 - x2)) / (pow(x1, 2) - pow(x2, 2));
+  //  (*c) = D1 - (*a)*pow(x1, 2) - (*b)*x1;
+  //}
+  //else
+  //{
+  //  /*
+  //  printf("\t %f\t %f\t %f\n", *a, *b, *c);
+  //  (*a) = (*a) - 2 * ((2 * (*a)* log(bpp_comp) + (*b)) / (bpp_comp)
+  //    -(2 * (*a)* log(bpp_real) + (*b)) / (bpp_real))
+  //    * (2 * log(bpp_comp) / (bpp_comp)-2 * log(bpp_real) / (bpp_real)) * 10;
+  //  (*b) = (*b) - 2 * ((2 * (*a)* log(bpp_comp) + (*b)) / (bpp_comp)
+  //    -(2 * (*a)* log(bpp_real) + (*b)) / (bpp_real))
+  //    * (1 / (bpp_comp)-1 / (bpp_real)) * 2.5;
+  //  (*c) = m_picMSE - (*a)*pow(log(bpp_real), 2) - (*b)*log(bpp_real); 
+  //  */
+  //  (*a) = ((2 * bpp_real*(*a)*log(bpp_comp / 3) + (*b)*(bpp_real - bpp_comp)) / (2 * bpp_comp*log(bpp_real / 3)));
+  //  //(*a) = ((2 * bpp_comp*log(bpp_real / 3)) + (*b)*(bpp_real - bpp_comp)) / (2 * bpp_real*(*a)*log(bpp_comp / 3));
+  //  (*b) = (*b) *bpp_real / bpp_comp +
+  //    (2 * bpp_real*(*a)*(bpp_real*log(bpp_comp / 3) - bpp_comp * log(bpp_real / 3))) / bpp_comp;
+  //  (*c) = m_picMSE - (*a)*pow(log(bpp_real), 2) - (*b)*log(bpp_real);
+  //}
+  ////printf("\n %f\t %f\t %f\t %f\t %f\t %f", m_encRCSeq->m_bitscur*m_numberOfPixel, m_encRCSeq->m_bitspre*m_numberOfPixel, m_encRCSeq->m_bitsprepre*m_numberOfPixel, m_encRCSeq->m_MSEcur, m_encRCSeq->m_MSEpre, m_encRCSeq->m_MSEprepre);
+  ////printf("\t %f\t %f\t %f\n", *a, *b, *c);
+  //
 
 }
 #else
