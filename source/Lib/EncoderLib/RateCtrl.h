@@ -83,7 +83,8 @@ const double g_RCBetaMaxValue  = -0.1;
 
 #if USE_R_Lambda_INTRA
 #define ParaA 98.07068771
-#define ParaB 200.3489255082372
+//#define ParaB -200.3489255082372
+#define ParaB 0.0
 #define ParaC 161.25261317114496
 
 

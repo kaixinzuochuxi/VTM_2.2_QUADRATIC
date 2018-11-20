@@ -1833,9 +1833,9 @@ double EncRCPic::calculateLambdaIntra(double a, double b, double MADPerPixel, do
 #if PrintTemporalResult 
   printf("%f\t%f\t%f\t", MADPerPixel, bitsPerPixel,bpp);
 #endif
-  return  -2*a * log(bpp/3) / bpp - b / bpp ;
+  //return  -2*a * log(bpp/3) / bpp - b / bpp ;
   //return exp((6 * log2(bpp) + 4 - 13.7122) / 4.2005);
-  //return  (-2 * a * log(bitsPerPixel) / bitsPerPixel - b / bitsPerPixel)* ;
+  return  (-2 * a * log(bitsPerPixel) / bitsPerPixel - b / bitsPerPixel)/10 ;
   
 
 }
@@ -1896,11 +1896,14 @@ void EncRCPic::updateAlphaBetaIntra(double *a, double *b, double *c)
   
   // k:symmetry axis
   double k = (*b) / 2 / (*a);
-  printf("%f\t", k);
+  printf("%f\t%f", k, m_picMSE);
   (*a) = ((*a)*((log(bpp_comp/3) + k) / bpp_comp) / ((log(bpp_real/3) + k) / bpp_real));
-  (*b) = 2 * (*a)*(k*bpp_real / bpp_comp + (bpp_real*log(bpp_comp) - bpp_comp * log(bpp_real)) / bpp_comp);
-  (*c) = m_picMSE - (*a)*pow(log(bpp_real/3), 2) - (*b)*log(bpp_real/3);
-
+  double k1= (k*bpp_real / bpp_comp + (bpp_real*log(bpp_comp) - bpp_comp * log(bpp_real)) / bpp_comp);
+  k1 = Clip3(k*0.9, k1, k*1.1);
+  (*a) = max(20.0, (*a));
+  (*b) = 2 * (*a)*k1;
+  //(*b) = max(100.0, (*b)); 
+  (*c) = m_picMSE - (*a)*pow(log(bpp_real / 3), 2) - (*b)*log(bpp_real / 3);
 
 
 
@@ -1912,12 +1915,12 @@ void EncRCPic::updateAlphaBetaIntra(double *a, double *b, double *c)
 
 
   
-  
+  //
   //(*a) = (*a) - 2 * ((2 * (*a)* log(bpp_comp/3) + (*b)) / (bpp_comp)
   //  -(2 * (*a)* log(bpp_real/3) + (*b)) / (bpp_real))
-  //  * (2 * log(bpp_comp/3) / (bpp_comp)) * 0.01;
-  //(*b) = (*b) - 2 * ((2 * (*a)* log(bpp_comp) + (*b)) / (bpp_comp) -(2 * (*a)* log(bpp_real) )* (1 / (bpp_comp))) * 0.01 ;
-  //(*c) = m_picMSE - (*a)*pow(log(bpp_real), 2) - (*b)*log(bpp_real);
+  //  * (2 * log(bpp_comp/3) / (bpp_comp)) * 0.1;
+  //(*b) = (*b) - 2 * ((2 * (*a)* log(bpp_comp/3) + (*b)) / (bpp_comp) -(2 * (*a)* log(bpp_real/3) )* (1 / (bpp_comp))) * 0.1 ;
+  //(*c) = m_picMSE - (*a)*pow(log(bpp_real/3), 2) - (*b)*log(bpp_real/3);
   //
 
   
