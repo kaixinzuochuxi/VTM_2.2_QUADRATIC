@@ -832,6 +832,7 @@ double EncRCPic::estimatePicLambda(list<EncRCPic*>& listPreviousPictures, bool i
   {
     ///////////////////////////////////////////TODO?????
     estLambda = calculateLambdaIntra(a, b, pow(m_totalCostIntra / (double)m_numberOfPixel, BETA1), bpp);
+    //printf("%f\t", estLambda);
   }
   else
   {
@@ -1835,7 +1836,7 @@ double EncRCPic::calculateLambdaIntra(double a, double b, double MADPerPixel, do
 #endif
   //return  -2*a * log(bpp/3) / bpp - b / bpp ;
   //return exp((6 * log2(bpp) + 4 - 13.7122) / 4.2005);
-  return  (-2 * a * log(bitsPerPixel) / bitsPerPixel - b / bitsPerPixel)/10 ;
+  return  ((-2 * a * log(bitsPerPixel/3) / bitsPerPixel - b / bitsPerPixel)/10) ;
   
 
 }
@@ -1896,9 +1897,9 @@ void EncRCPic::updateAlphaBetaIntra(double *a, double *b, double *c)
   
   // k:symmetry axis
   double k = (*b) / 2 / (*a);
-  printf("%f\t%f", k, m_picMSE);
+  //printf("%f\t%f", k, m_picMSE);
   (*a) = ((*a)*((log(bpp_comp/3) + k) / bpp_comp) / ((log(bpp_real/3) + k) / bpp_real));
-  double k1= (k*bpp_real / bpp_comp + (bpp_real*log(bpp_comp) - bpp_comp * log(bpp_real)) / bpp_comp);
+  double k1= (k*bpp_real / bpp_comp + (bpp_real*log(bpp_comp/3) - bpp_comp * log(bpp_real/3)) / bpp_comp);
   k1 = Clip3(k*0.9, k1, k*1.1);
   (*a) = max(20.0, (*a));
   (*b) = 2 * (*a)*k1;
