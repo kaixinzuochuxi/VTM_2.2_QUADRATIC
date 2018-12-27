@@ -1062,6 +1062,7 @@ int EncRCPic::estimatePicQP( double lambda, list<EncRCPic*>& listPreviousPicture
   if ( lastLevelQP > g_RCInvalidQPValue )
   {
     QP = Clip3( lastLevelQP - 3, lastLevelQP + 3, QP );
+    //QP = Clip3(lastLevelQP - 5, lastLevelQP + 5, QP);
   }
 
   if( lastPicQP > g_RCInvalidQPValue )
@@ -1830,13 +1831,15 @@ double EncRCPic::calculateLambdaIntra(double a, double b, double MADPerPixel, do
 
 
   double bpp = MADPerPixel / bitsPerPixel/25;
-  //double bpp = exp(-b/a)/MADPerPixel * bitsPerPixel*3;
+  //double bpp = exp(-b/a)/MADPerPixel * bitsPerPixel*10;
 #if PrintTemporalResult 
   printf("%f\t%f\t%f\t", MADPerPixel, bitsPerPixel,bpp);
 #endif
   //return  -2*a * log(bpp/3) / bpp - b / bpp ;
   //return exp((6 * log2(bpp) + 4 - 13.7122) / 4.2005);
-  return  ((-2 * a * log(bitsPerPixel/3) / bitsPerPixel - b / bitsPerPixel)/10) ;
+  //return  ((-2 * a * log(bitsPerPixel/3) / bitsPerPixel - b / bitsPerPixel)/13) ;
+  return  ((-2 * a * log(bitsPerPixel / 3) / bitsPerPixel - b / bitsPerPixel) / (13 - 1.5*bitsPerPixel));
+  //return  ((-2 * a * log(bitsPerPixel / 3) / bitsPerPixel - b / bitsPerPixel) / (12- 1.5*bitsPerPixel * bitsPerPixel));
   
 
 }
@@ -1898,10 +1901,20 @@ void EncRCPic::updateAlphaBetaIntra(double *a, double *b, double *c)
   // k:symmetry axis
   double k = (*b) / 2 / (*a);
   //printf("%f\t%f", k, m_picMSE);
+  //double a_ori = (*a);
+  
   (*a) = ((*a)*((log(bpp_comp/3) + k) / bpp_comp) / ((log(bpp_real/3) + k) / bpp_real));
+  //(*a) = Clip3(a_ori / 3, (*a), a_ori * 3);
+  
+
   double k1= (k*bpp_real / bpp_comp + (bpp_real*log(bpp_comp/3) - bpp_comp * log(bpp_real/3)) / bpp_comp);
   k1 = Clip3(k*0.9, k1, k*1.1);
+
+
   (*a) = max(20.0, (*a));
+  
+  
+  
   (*b) = 2 * (*a)*k1;
   //(*b) = max(100.0, (*b)); 
   (*c) = m_picMSE - (*a)*pow(log(bpp_real / 3), 2) - (*b)*log(bpp_real / 3);

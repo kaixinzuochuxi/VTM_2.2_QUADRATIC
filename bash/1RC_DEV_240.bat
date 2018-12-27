@@ -38,12 +38,10 @@ set encoding_mode=AI
 
 
 
-start	.\RC_266_DEV.bat	RaceHorses_416x240_30	22	%encoder%	%encoding_mode% "--LCULevelRateControl=0"
-start	.\RC_266_DEV.bat	RaceHorses_416x240_30	27	%encoder%	%encoding_mode% "--LCULevelRateControl=0"
-start	.\RC_266_DEV.bat	RaceHorses_416x240_30	32	%encoder%	%encoding_mode% "--LCULevelRateControl=0"
-start	.\RC_266_DEV.bat	RaceHorses_416x240_30	37	%encoder%	%encoding_mode% "--LCULevelRateControl=0"
-
-
+start	.\RC_266_DEV.bat	BasketballPass_416x240_50	22	%encoder%	%encoding_mode%
+start	.\RC_266_DEV.bat	BasketballPass_416x240_50	27	%encoder%	%encoding_mode%
+start	.\RC_266_DEV.bat	BasketballPass_416x240_50	32	%encoder%	%encoding_mode%
+start	.\RC_266_DEV.bat	BasketballPass_416x240_50	37	%encoder%	%encoding_mode%
 
 
 

@@ -62,7 +62,7 @@
 
 #if USE_R_Lambda
 #define USE_R_Lambda_INTRA                                1  ///add by zml
-#define PrintTemporalResult                               0
+#define PrintTemporalResult                               1
 #endif
 
 

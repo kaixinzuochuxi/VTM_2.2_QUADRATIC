@@ -11,7 +11,8 @@
 
 SETLOCAL
 set seq_name=%1
-set bitrate=%2
+set fixqp=%2
+for /f "delims=" %%t in ('.\QP_BITRATE_VTM2.2.bat %seq_name% %fixqp%') do set bitrate=%%t
 set encoder=%3
 set coding_structure=%4
 

@@ -43,10 +43,10 @@ set encoding_mode=AI
 
 
 
-start	.\RC_266_DEV.bat	BQSquare_416x240_60	12339100	%encoder%	%encoding_mode% "--LCULevelRateControl=0"
-start	.\RC_266_DEV.bat	BQSquare_416x240_60	7898929.6	%encoder%	%encoding_mode% "--LCULevelRateControl=0"
-start	.\RC_266_DEV.bat	BQSquare_416x240_60	4869597.6	%encoder%	%encoding_mode% "--LCULevelRateControl=0"
-start	.\RC_266_DEV.bat	BQSquare_416x240_60	2876344	%encoder%	%encoding_mode% "--LCULevelRateControl=0"
+start	.\RC_266_DEV.bat	BQSquare_416x240_60	22	%encoder%	%encoding_mode% "--LCULevelRateControl=0"
+start	.\RC_266_DEV.bat	BQSquare_416x240_60	27	%encoder%	%encoding_mode% "--LCULevelRateControl=0"
+start	.\RC_266_DEV.bat	BQSquare_416x240_60	32	%encoder%	%encoding_mode% "--LCULevelRateControl=0"
+start	.\RC_266_DEV.bat	BQSquare_416x240_60	37	%encoder%	%encoding_mode% "--LCULevelRateControl=0"
 
 
 

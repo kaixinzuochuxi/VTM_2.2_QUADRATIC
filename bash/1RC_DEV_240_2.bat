@@ -41,10 +41,10 @@ set encoding_mode=AI
 
 
 
-start	.\RC_266_DEV.bat	BlowingBubbles_416x240_50	10666775.2	%encoder%	%encoding_mode% "--LCULevelRateControl=0"
-start	.\RC_266_DEV.bat	BlowingBubbles_416x240_50	6616793.6	%encoder%	%encoding_mode% "--LCULevelRateControl=0"
-::start	.\RC_266_DEV.bat	BlowingBubbles_416x240_50	3782460.8	%encoder%	%encoding_mode% "--LCULevelRateControl=0"
-::start	.\RC_266_DEV.bat	BlowingBubbles_416x240_50	1923687.2	%encoder%	%encoding_mode% "--LCULevelRateControl=0"
+start	.\RC_266_DEV.bat	BlowingBubbles_416x240_50	22	%encoder%	%encoding_mode% "--LCULevelRateControl=0"
+start	.\RC_266_DEV.bat	BlowingBubbles_416x240_50	27	%encoder%	%encoding_mode% "--LCULevelRateControl=0"
+start	.\RC_266_DEV.bat	BlowingBubbles_416x240_50	32	%encoder%	%encoding_mode% "--LCULevelRateControl=0"
+start	.\RC_266_DEV.bat	BlowingBubbles_416x240_50	37	%encoder%	%encoding_mode% "--LCULevelRateControl=0"
 
 
 

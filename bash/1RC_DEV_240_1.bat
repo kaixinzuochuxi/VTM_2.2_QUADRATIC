@@ -38,10 +38,10 @@ set encoding_mode=AI
 
 
 
-start	.\RC_266_DEV.bat	BasketballPass_416x240_50	4775440	%encoder%	%encoding_mode% "--LCULevelRateControl=0"
-start	.\RC_266_DEV.bat	BasketballPass_416x240_50	2862928	%encoder%	%encoding_mode% "--LCULevelRateControl=0"
-start	.\RC_266_DEV.bat	BasketballPass_416x240_50	1657066.4	%encoder%	%encoding_mode% "--LCULevelRateControl=0"
-start	.\RC_266_DEV.bat	BasketballPass_416x240_50	924892	%encoder%	%encoding_mode% "--LCULevelRateControl=0"
+start	.\RC_266_DEV.bat	BasketballPass_416x240_50	22	%encoder%	%encoding_mode% "--LCULevelRateControl=0"
+start	.\RC_266_DEV.bat	BasketballPass_416x240_50	27	%encoder%	%encoding_mode% "--LCULevelRateControl=0"
+start	.\RC_266_DEV.bat	BasketballPass_416x240_50	32	%encoder%	%encoding_mode% "--LCULevelRateControl=0"
+start	.\RC_266_DEV.bat	BasketballPass_416x240_50	37	%encoder%	%encoding_mode% "--LCULevelRateControl=0"
 
 
 
