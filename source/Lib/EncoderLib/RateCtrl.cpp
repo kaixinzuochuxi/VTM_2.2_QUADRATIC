@@ -1913,7 +1913,9 @@ void EncRCPic::updateAlphaBetaIntra(double *a, double *b, double *c)
   //printf("%f\t%f", k, m_picMSE);
   //double a_ori = (*a);
   
-  (*a) = ((*a)*((log(bpp_comp/3) + k) / bpp_comp) / ((log(bpp_real/3) + k) / bpp_real));
+  //(*a) = ((*a)*((log(bpp_comp/3) + k) / bpp_comp) / ((log(bpp_real/3) + k) / bpp_real));
+  (*a) = ((*a)*(((log(bpp_comp / 3) + k) / bpp_comp) / ((log(bpp_real / 3) + k) / bpp_real))+1)/2;
+
   //(*a) = Clip3(a_ori / 3, (*a), a_ori * 3);
   
 
