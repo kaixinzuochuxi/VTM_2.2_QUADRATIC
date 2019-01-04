@@ -1858,7 +1858,7 @@ double EncRCPic::calculateLambdaIntra(double alpha, double beta, double MADPerPi
 {
   /////////////////////////////////////TODO
 #if PrintTemporalResult 
-  printf("%f\t%f\t", MADPerPixel, bitsPerPixel);
+  printf("%f\t%f\t%f\t", MADPerPixel, bitsPerPixel, MADPerPixel/ bitsPerPixel);
 #endif
   return ( (alpha/256.0) * pow( MADPerPixel/bitsPerPixel, beta ) );
 }
