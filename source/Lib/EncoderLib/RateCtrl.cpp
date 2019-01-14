@@ -1836,7 +1836,7 @@ double EncRCPic::calculateLambdaIntra(double a, double b, double MADPerPixel, do
 
   //double bpp = MADPerPixel / bitsPerPixel;
   //double bpp = exp(-b/a)/MADPerPixel * bitsPerPixel*75;
-  double bpp = 12.9860 / MADPerPixel * bitsPerPixel * 9*1.3;
+  double bpp = 12.9860 / MADPerPixel * bitsPerPixel * 9*1.5;
   //double bpp = max(exp(-b / a) / MADPerPixel * bitsPerPixel * 9, bitsPerPixel);
 #if PrintTemporalResult 
   printf("%f\t%f\t%f\t", MADPerPixel, bitsPerPixel,bpp);
